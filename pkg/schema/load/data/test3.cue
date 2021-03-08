@@ -1,4 +1,4 @@
-package grafanaschema
+package grafanaschematest3
 
 dashboardFamily: #SchemaFamily & {
 	seqs: [

@@ -1,6 +1,8 @@
 package schema
 
-import "cuelang.org/go/cue"
+import (
+	"cuelang.org/go/cue"
+)
 
 // Shared cue.Runtime that all relevant operations reuse.
 //
@@ -59,42 +61,75 @@ func (s Seq) Validate() error {
 // A standard pattern to define schema and their migrations to successor schema
 // in .cue files is given in the load package, and codified into its functions.
 // (TODO this needs to actually be hammered out!)
-type CueSchema interface {
-	// Validate checks that the resource is correct with respect to the schema.
-	Validate(Resource) error
+type CueSchema struct {
+	ActualSchema cue.Value
+}
 
-	// ApplyDefaults returns a new, concrete copy of the Resource with all paths
-	// that are 1) missing in the Resource AND 2) specified by the schema,
-	// filled with default values specified by the schema.
-	ApplyDefaults(Resource) (Resource, error)
+// Validate checks that the resource is correct with respect to the schema.
+func (cs *CueSchema) Validate(input cue.Value) error {
+	return nil
+}
 
-	// TrimDefaults returns a new, concrete copy of the Resource where all paths
-	// in the  where the values at those paths are the same as the default value
-	// given in the schema.
-	TrimDefaults(Resource) (Resource, error)
+// ApplyDefaults returns a new, concrete copy of the Resource with all paths
+// that are 1) missing in the Resource AND 2) specified by the schema,
+// filled with default values specified by the schema.
+func (cs *CueSchema) ApplyDefaults(input cue.Value) (cue.Value, error) {
+	return input, nil
+}
 
-	// Migrate transforms an Resource into a new Resource that is correct with
-	// respect to its Successor schema.
-	Migrate(Resource) (Resource, bool, error)
+// TrimDefaults returns a new, concrete copy of the Resource where all paths
+// in the  where the values at those paths are the same as the default value
+// given in the schema.
+func (cs *CueSchema) TrimDefaults(input cue.Value) (cue.Value, error) {
+	return input, nil
+}
 
-	// Successor returns the CueSchema to which this CueSchema knows how to
-	// migrate, if any.
-	Successor() CueSchema
+// Migrate transforms an Resource into a new Resource that is correct with
+// respect to its Successor schema.
+func (cs *CueSchema) Migrate(input cue.Value) (cue.Value, bool, error) {
+	return input, true, nil
+}
 
-	// Actual returns the cue.Value representing the actual schema.
-	Actual() cue.Value
+// Successor returns the CueSchema to which this CueSchema knows how to
+// migrate, if any.
+func (cs *CueSchema) Successor() (*CueSchema, error) {
+	return cs, nil
+}
+
+// Actual returns the cue.Value representing the actual schema.
+func (cs *CueSchema) Actual() cue.Value {
+	return cs.ActualSchema
 }
 
 // VersionedCueSchema are CueSchema that are part of a backwards-compatible
 // versioned Seq.
-type VersionedCueSchema interface {
-	CueSchema
+type VersionedCueSchema struct {
+	CSchema                CueSchema
+	major                  int
+	minor                  int
+	nextVersionedCueSchema *VersionedCueSchema
+}
 
-	// Version reports the major and minor versions of the schema.
-	Version() (major, minor int)
+// NewVersionedCueSchema create a new versioned cue schema object
+func NewVersionedCueSchema(cv cue.Value, mj int, mn int) *VersionedCueSchema {
+	sc := &CueSchema{
+		ActualSchema: cv,
+	}
+	return &VersionedCueSchema{
+		CSchema: *sc,
+		major:   mj,
+		minor:   mn,
+	}
+}
 
-	// Returns the next VersionedCueSchema
-	Next() VersionedCueSchema
+// Version reports the major and minor versions of the schema.
+func (vcs *VersionedCueSchema) Version() (int, int) {
+	return vcs.major, vcs.minor
+}
+
+// Next Returns the next VersionedCueSchema
+func (vcs *VersionedCueSchema) Next() *VersionedCueSchema {
+	return vcs.nextVersionedCueSchema
 }
 
 // Validate checks the provided Resource against all CueSchema known
@@ -109,10 +144,10 @@ type VersionedCueSchema interface {
 // nested objects.
 //
 // Additional CueSchema may be provided to check for validation.
-func (f *Family) Validate(r Resource, s ...CueSchema) (CueSchema, error) {
-	var i CueSchema
-	return i, nil
-}
+// func (f *Family) Validate(r Resource, s ...CueSchema) (CueSchema, error) {
+// 	var i CueSchema
+// 	return i, nil
+// }
 
 // A Resource represents a concrete configuration object - e.g., JSON
 // representing a dashboard.
@@ -125,7 +160,7 @@ type Resource struct {
 	Value cue.Value
 }
 
-// Indicates that an resource has indicated it is created from a schema version
+// TooNewError Indicates that an resource has indicated it is created from a schema version
 // that is newer than what the Family is aware of.
 type TooNewError struct {
 }

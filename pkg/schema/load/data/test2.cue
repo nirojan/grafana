@@ -1,6 +1,6 @@
-package grafanaschema
+package grafanaschematest2
 
-dashboardFamily: #SchemaFamily & {
+dashboardFamily2: #SchemaFamily & {
 	seqs: [
 		[ // 0.0
 			{
@@ -26,7 +26,7 @@ dashboardFamily: #SchemaFamily & {
                     // 0 for no shared crosshair or tooltip (default).
                     // 1 for shared crosshair.
                     // 2 for shared crosshair AND shared tooltip.
-                    graphTooltip: int & >= 0 & <= 2 | *0
+                    graphTooltip: int & >=0 & <=2 | *0
                     // Time range for dashboard, e.g. last 6 hours, last 7 days, etc
                     time?: {
                         from: string | *"now-6h"
@@ -121,6 +121,10 @@ dashboardFamily: #SchemaFamily & {
                     // scenario.)
                     fieldConfig: FieldConfigSource
                 }
+            },
+            {
+               dashboardFamily.seqs[0][0]
+               Dashboard: foo: string  
             }
 		]
 	]
@@ -217,13 +221,13 @@ MatcherConfig: {
 } @cuetsy(targetType="interface")
 PanelGridPos: {
 	// Panel 
-	h: int & > 0 | *9
+	h: int & >0 | *9
 	// Panel 
-	w: int & > 0 & <= 24 | *12
+	w: int & >0 & <=24 | *12
 	// Panel x 
-	x: int & >= 0 & < 24 | *0
+	x: int & >=0 & <24 | *0
 	// Panel y 
-	y: int & >= 0 | *0
+	y: int & >=0 | *0
 	// true if fixed
 	static?: bool
 }

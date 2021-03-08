@@ -42,25 +42,33 @@ var buildFamilyFunc = BuildDashboardFamily
 
 // BuildDashboardFamily read from cue file and build schema.Family go object
 func BuildDashboardFamily(fam *schema.Family, famval cue.Value) (*schema.Family, error) {
-	fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 1")
 	majorVersionArray := famval.Lookup("seqs")
 	if !majorVersionArray.Exists() {
 		return fam, fmt.Errorf("seqs field has to exist in cue definition")
 	}
 
-	fmt.Printf("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< %v+", majorVersionArray)
-	majorVerstionIte, err := majorVersionArray.Fields(cue.Definitions(true))
+	majorVerstionIte, err := majorVersionArray.List()
 	if err != nil {
 		return fam, err
 	}
-	fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 3")
-	if majorVerstionIte == nil {
-		return fam, fmt.Errorf("seqs has to contain at least one element")
-	}
-	for majorVerstionIte != nil && majorVerstionIte.Next() {
 
+	major := 0
+	for majorVerstionIte.Next() {
+		minor := 0
+		var majorseq schema.Seq
+		minorVersionIte, err := majorVerstionIte.Value().List()
+		if err != nil {
+			return fam, err
+		}
+		for minorVersionIte.Next() {
+			fmt.Printf("<<<<<<<<<<<<<<<<<<<<<<<<<<<<< %v+", minorVersionIte.Value())
+			vcs := schema.NewVersionedCueSchema(minorVersionIte.Value(), major, minor)
+			majorseq = append(majorseq, *vcs)
+			minor++
+		}
+		fam.Seqs = append(fam.Seqs, majorseq)
+		major++
 	}
-	fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 4")
 	return fam, nil
 }
 
@@ -90,7 +98,6 @@ func BaseDashboard(p BaseLoadPaths) (*schema.Family, error) {
 	insts := cue.Build(SchemaInstances)
 	for _, l := range insts {
 		famval := l.Lookup("dashboardFamily")
-		fmt.Printf("<<<<<<<<<<<<<<<<<<<<<<<< %v+", famval)
 		if famval.Exists() == true {
 			fam, err = buildFamilyFunc(fam, famval)
 			return fam, err
