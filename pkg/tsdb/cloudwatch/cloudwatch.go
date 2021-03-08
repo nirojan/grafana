@@ -71,12 +71,18 @@ func (s *CloudWatchService) Init() error {
 }
 
 func (s *CloudWatchService) NewExecutor(*models.DataSource) (plugins.DataPlugin, error) {
-	return newExecutor(s.LogsService), nil
+	config := setting.GetCfg()
+	return newExecutor(s.LogsService, newAWSSettings(config.AWSListMetricsPageLimit)), nil
 }
 
-func newExecutor(logsService *LogsService) *cloudWatchExecutor {
+func newAWSSettings(listMetricsPageLimit int) *awsSettings {
+	return &awsSettings{ListMetricsPageLimit: listMetricsPageLimit}
+}
+
+func newExecutor(logsService *LogsService, awsConfig *awsSettings) *cloudWatchExecutor {
 	return &cloudWatchExecutor{
 		logsService: logsService,
+		settings:    awsConfig,
 	}
 }
 
@@ -88,6 +94,7 @@ type cloudWatchExecutor struct {
 	rgtaClient resourcegroupstaggingapiiface.ResourceGroupsTaggingAPIAPI
 
 	logsService *LogsService
+	settings    *awsSettings
 }
 
 func (e *cloudWatchExecutor) newSession(region string) (*session.Session, error) {
