@@ -96,8 +96,8 @@ func (cs *CueSchema) Successor() (*CueSchema, error) {
 	return cs, nil
 }
 
-// Actual returns the cue.Value representing the actual schema.
-func (cs *CueSchema) Actual() cue.Value {
+// CUE returns the cue.Value representing the actual schema.
+func (cs *CueSchema) CUE() cue.Value {
 	return cs.ActualSchema
 }
 
