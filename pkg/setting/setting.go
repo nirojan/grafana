@@ -945,7 +945,7 @@ func (cfg *Cfg) readAWSConfig() {
 			cfg.AWSAllowedAuthProviders = append(cfg.AWSAllowedAuthProviders, authProvider)
 		}
 	}
-	cfg.AWSListMetricsPageLimit = awsPluginSec.Key("list_metrics_page_limit").MustInt(1000)
+	cfg.AWSListMetricsPageLimit = awsPluginSec.Key("list_metrics_page_limit").MustInt(500)
 }
 
 func (cfg *Cfg) readSessionConfig() {

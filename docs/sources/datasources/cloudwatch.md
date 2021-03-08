@@ -375,6 +375,10 @@ To request a quota increase, visit the [AWS Service Quotas console](https://cons
 
 Please see the AWS documentation for [Service Quotas](https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html) and [CloudWatch limits](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_limits.html) for more information.
 
+## Configure the ListMetrics API page limit
+
+When a custom namespace is specfied in the query editor, the [List Metrics API](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_ListMetrics.html) is used to populate the _Metrics_ field and the _Dimension_ field with values. The API is paginated and returns up to 500 results per page. The CloudWatch data source will limit the number of pages to 500, but this limit overruled by changing the `list_metrics_page_limit` variable in the [grafana config file](https://grafana.com/docs/grafana/latest/administration/configuration/#aws).
+
 ## Configure the data source with provisioning
 
 It's now possible to configure data sources using config files with Grafana's provisioning system. You can read more about how it works and all the settings you can set for data sources on the [provisioning docs page]({{< relref "../administration/provisioning/#datasources" >}})
