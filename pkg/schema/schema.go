@@ -82,7 +82,7 @@ type CueSchema interface {
 	Successor() CueSchema
 
 	// Actual returns the cue.Value representing the actual schema.
-	Actual() cue.Value
+	CUE() cue.Value
 }
 
 // VersionedCueSchema are CueSchema that are part of a backwards-compatible
