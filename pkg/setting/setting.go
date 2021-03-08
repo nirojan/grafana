@@ -275,7 +275,7 @@ type Cfg struct {
 	// AWS Plugin Auth
 	AWSAllowedAuthProviders []string
 	AWSAssumeRoleEnabled    bool
-	AWSListMetricsPageLimit  int
+	AWSListMetricsPageLimit int
 
 	// Auth proxy settings
 	AuthProxyEnabled          bool

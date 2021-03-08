@@ -87,9 +87,9 @@ func (c FakeCWClient) ListMetricsPages(input *cloudwatch.ListMetricsInput, fn fu
 		c.MetricsPerPage = 1000
 	}
 	chunks := chunkSlice(c.Metrics, c.MetricsPerPage)
-	
+
 	for i, metrics := range chunks {
-	 	response := fn(&cloudwatch.ListMetricsOutput{
+		response := fn(&cloudwatch.ListMetricsOutput{
 			Metrics: metrics,
 		}, i+1 == len(chunks))
 		if !response {

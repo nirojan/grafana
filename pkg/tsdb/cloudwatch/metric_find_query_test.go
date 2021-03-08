@@ -500,7 +500,6 @@ func TestQuery_ResourceARNs(t *testing.T) {
 	})
 }
 
-
 func TestQuery_ListMetricsPagination(t *testing.T) {
 	origNewCWClient := NewCWClient
 	t.Cleanup(func() {
@@ -514,21 +513,21 @@ func TestQuery_ListMetricsPagination(t *testing.T) {
 	}
 
 	metrics := []*cloudwatch.Metric{
-		{ MetricName: aws.String("Test_MetricName1") },
-		{ MetricName: aws.String("Test_MetricName2") },
-		{ MetricName: aws.String("Test_MetricName3") },
-		{ MetricName: aws.String("Test_MetricName4") },
-		{ MetricName: aws.String("Test_MetricName5") },
-		{ MetricName: aws.String("Test_MetricName6") },
-		{ MetricName: aws.String("Test_MetricName7") },
-		{ MetricName: aws.String("Test_MetricName8") },
-		{ MetricName: aws.String("Test_MetricName9") },
-		{ MetricName: aws.String("Test_MetricName10") },
+		{MetricName: aws.String("Test_MetricName1")},
+		{MetricName: aws.String("Test_MetricName2")},
+		{MetricName: aws.String("Test_MetricName3")},
+		{MetricName: aws.String("Test_MetricName4")},
+		{MetricName: aws.String("Test_MetricName5")},
+		{MetricName: aws.String("Test_MetricName6")},
+		{MetricName: aws.String("Test_MetricName7")},
+		{MetricName: aws.String("Test_MetricName8")},
+		{MetricName: aws.String("Test_MetricName9")},
+		{MetricName: aws.String("Test_MetricName10")},
 	}
 
 	t.Run("List Metrics and page limit is reached", func(t *testing.T) {
-		client = FakeCWClient{ Metrics: metrics, MetricsPerPage: 2 }
-		executor := newExecutor(nil, &awsSettings{ ListMetricsPageLimit: 3 })
+		client = FakeCWClient{Metrics: metrics, MetricsPerPage: 2}
+		executor := newExecutor(nil, &awsSettings{ListMetricsPageLimit: 3})
 		executor.DataSource = fakeDataSource()
 		response, err := executor.listMetrics("default", &cloudwatch.ListMetricsInput{})
 		require.NoError(t, err)
@@ -537,8 +536,8 @@ func TestQuery_ListMetricsPagination(t *testing.T) {
 	})
 
 	t.Run("List Metrics and page limit is not reached", func(t *testing.T) {
-		client = FakeCWClient{ Metrics: metrics, MetricsPerPage: 2 }
-		executor := newExecutor(nil, &awsSettings{ ListMetricsPageLimit: 1000 })
+		client = FakeCWClient{Metrics: metrics, MetricsPerPage: 2}
+		executor := newExecutor(nil, &awsSettings{ListMetricsPageLimit: 1000})
 		executor.DataSource = fakeDataSource()
 		response, err := executor.listMetrics("default", &cloudwatch.ListMetricsInput{})
 		require.NoError(t, err)
