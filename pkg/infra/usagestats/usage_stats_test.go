@@ -97,6 +97,23 @@ func TestMetrics(t *testing.T) {
 			return nil
 		})
 
+		var getESJSONDataQuery *models.GetESJSONDataQuery
+		uss.Bus.AddHandler(func(query *models.GetESJSONDataQuery) error {
+			query.Result = []*models.JSONData{
+				{
+					JsonData: `{"esVersion": 2}`,
+				},
+				{
+					JsonData: `{"esVersion": 2}`,
+				},
+				{
+					JsonData: `{"esVersion": 70}`,
+				},
+			}
+			getESJSONDataQuery = query
+			return nil
+		})
+
 		var getDataSourceAccessStatsQuery *models.GetDataSourceAccessStatsQuery
 		uss.Bus.AddHandler(func(query *models.GetDataSourceAccessStatsQuery) error {
 			query.Result = []*models.DataSourceAccessStats{
@@ -202,6 +219,7 @@ func TestMetrics(t *testing.T) {
 			t.Run("Should not gather stats or call http endpoint", func(t *testing.T) {
 				assert.Nil(t, getSystemStatsQuery)
 				assert.Nil(t, getDataSourceStatsQuery)
+				assert.Nil(t, getESJSONDataQuery)
 				assert.Nil(t, getDataSourceAccessStatsQuery)
 				assert.Nil(t, req)
 			})
@@ -228,6 +246,7 @@ func TestMetrics(t *testing.T) {
 
 				assert.NotNil(t, getSystemStatsQuery)
 				assert.NotNil(t, getDataSourceStatsQuery)
+				assert.NotNil(t, getESJSONDataQuery)
 				assert.NotNil(t, getDataSourceAccessStatsQuery)
 				assert.NotNil(t, getAlertNotifierUsageStatsQuery)
 				assert.NotNil(t, req)
@@ -269,6 +288,10 @@ func TestMetrics(t *testing.T) {
 
 				assert.Equal(t, 9, metrics.Get("stats.ds."+models.DS_ES+".count").MustInt())
 				assert.Equal(t, 10, metrics.Get("stats.ds."+models.DS_PROMETHEUS+".count").MustInt())
+
+				assert.Equal(t, 2, metrics.Get("stats.ds."+models.DS_ES+".v2.count").MustInt())
+				assert.Equal(t, 1, metrics.Get("stats.ds."+models.DS_ES+".v70.count").MustInt())
+
 				assert.Equal(t, 11+12, metrics.Get("stats.ds.other.count").MustInt())
 
 				assert.Equal(t, 1, metrics.Get("stats.ds_access."+models.DS_ES+".direct.count").MustInt())
@@ -420,6 +443,11 @@ func TestMetrics(t *testing.T) {
 
 		uss.Bus.AddHandler(func(query *models.GetDataSourceStatsQuery) error {
 			query.Result = []*models.DataSourceStats{}
+			return nil
+		})
+
+		uss.Bus.AddHandler(func(query *models.GetESJSONDataQuery) error {
+			query.Result = []*models.JSONData{}
 			return nil
 		})
 
