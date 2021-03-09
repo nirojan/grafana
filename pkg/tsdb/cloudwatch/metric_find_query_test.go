@@ -532,7 +532,8 @@ func TestQuery_ListMetricsPagination(t *testing.T) {
 		response, err := executor.listMetrics("default", &cloudwatch.ListMetricsInput{})
 		require.NoError(t, err)
 
-		assert.Equal(t, 6, len(response))
+		expectedMetrics := client.MetricsPerPage * executor.settings.ListMetricsPageLimit
+		assert.Equal(t, expectedMetrics, len(response))
 	})
 
 	t.Run("List Metrics and page limit is not reached", func(t *testing.T) {
