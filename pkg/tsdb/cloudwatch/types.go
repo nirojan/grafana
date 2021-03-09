@@ -65,7 +65,3 @@ type metricStatMeta struct {
 	Stat   string `json:"stat"`
 	Period int    `json:"period"`
 }
-
-type awsSettings struct {
-	ListMetricsPageLimit int
-}
