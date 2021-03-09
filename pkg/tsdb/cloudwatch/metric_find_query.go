@@ -657,7 +657,7 @@ func (e *cloudWatchExecutor) listMetrics(region string, params *cloudwatch.ListM
 				cloudWatchMetrics = append(cloudWatchMetrics, metric.(*cloudwatch.Metric))
 			}
 		}
-		return !lastPage && pageNum < e.settings.ListMetricsPageLimit
+		return !lastPage && pageNum < e.settings.AWSListMetricsPageLimit
 	})
 
 	return cloudWatchMetrics, err

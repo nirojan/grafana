@@ -16,6 +16,7 @@ import (
 	"github.com/grafana/grafana/pkg/components/securejsondata"
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/models"
+	"github.com/grafana/grafana/pkg/setting"
 )
 
 type fakeDataSourceCfg struct {
@@ -175,6 +176,6 @@ func chunkSlice(slice []*cloudwatch.Metric, chunkSize int) [][]*cloudwatch.Metri
 	return chunks
 }
 
-func newDefaultAWSSettings() *awsSettings {
-	return &awsSettings{ListMetricsPageLimit: 1000}
+func newTestConfig() *setting.Cfg {
+	return &setting.Cfg{AWSListMetricsPageLimit: 1000}
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/plugins"
+	"github.com/grafana/grafana/pkg/setting"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -44,7 +45,7 @@ func TestQuery_Metrics(t *testing.T) {
 				},
 			},
 		}
-		executor := newExecutor(nil, newDefaultAWSSettings())
+		executor := newExecutor(nil, newTestConfig())
 		resp, err := executor.DataQuery(context.Background(), fakeDataSource(), plugins.DataQuery{
 			Queries: []plugins.DataSubQuery{
 				{
@@ -101,7 +102,7 @@ func TestQuery_Metrics(t *testing.T) {
 				},
 			},
 		}
-		executor := newExecutor(nil, newDefaultAWSSettings())
+		executor := newExecutor(nil, newTestConfig())
 		resp, err := executor.DataQuery(context.Background(), fakeDataSource(), plugins.DataQuery{
 			Queries: []plugins.DataSubQuery{
 				{
@@ -163,7 +164,7 @@ func TestQuery_Regions(t *testing.T) {
 		cli = fakeEC2Client{
 			regions: []string{regionName},
 		}
-		executor := newExecutor(nil, newDefaultAWSSettings())
+		executor := newExecutor(nil, newTestConfig())
 		resp, err := executor.DataQuery(context.Background(), fakeDataSource(), plugins.DataQuery{
 			Queries: []plugins.DataSubQuery{
 				{
@@ -245,7 +246,7 @@ func TestQuery_InstanceAttributes(t *testing.T) {
 				},
 			},
 		}
-		executor := newExecutor(nil, newDefaultAWSSettings())
+		executor := newExecutor(nil, newTestConfig())
 		resp, err := executor.DataQuery(context.Background(), fakeDataSource(), plugins.DataQuery{
 			Queries: []plugins.DataSubQuery{
 				{
@@ -348,7 +349,7 @@ func TestQuery_EBSVolumeIDs(t *testing.T) {
 				},
 			},
 		}
-		executor := newExecutor(nil, newDefaultAWSSettings())
+		executor := newExecutor(nil, newTestConfig())
 		resp, err := executor.DataQuery(context.Background(), fakeDataSource(), plugins.DataQuery{
 			Queries: []plugins.DataSubQuery{
 				{
@@ -448,7 +449,7 @@ func TestQuery_ResourceARNs(t *testing.T) {
 				},
 			},
 		}
-		executor := newExecutor(nil, newDefaultAWSSettings())
+		executor := newExecutor(nil, newTestConfig())
 		resp, err := executor.DataQuery(context.Background(), fakeDataSource(), plugins.DataQuery{
 			Queries: []plugins.DataSubQuery{
 				{
@@ -527,18 +528,18 @@ func TestQuery_ListMetricsPagination(t *testing.T) {
 
 	t.Run("List Metrics and page limit is reached", func(t *testing.T) {
 		client = FakeCWClient{Metrics: metrics, MetricsPerPage: 2}
-		executor := newExecutor(nil, &awsSettings{ListMetricsPageLimit: 3})
+		executor := newExecutor(nil, &setting.Cfg{AWSListMetricsPageLimit: 3})
 		executor.DataSource = fakeDataSource()
 		response, err := executor.listMetrics("default", &cloudwatch.ListMetricsInput{})
 		require.NoError(t, err)
 
-		expectedMetrics := client.MetricsPerPage * executor.settings.ListMetricsPageLimit
+		expectedMetrics := client.MetricsPerPage * executor.settings.AWSListMetricsPageLimit
 		assert.Equal(t, expectedMetrics, len(response))
 	})
 
 	t.Run("List Metrics and page limit is not reached", func(t *testing.T) {
 		client = FakeCWClient{Metrics: metrics, MetricsPerPage: 2}
-		executor := newExecutor(nil, &awsSettings{ListMetricsPageLimit: 1000})
+		executor := newExecutor(nil, &setting.Cfg{AWSListMetricsPageLimit: 1000})
 		executor.DataSource = fakeDataSource()
 		response, err := executor.listMetrics("default", &cloudwatch.ListMetricsInput{})
 		require.NoError(t, err)
